@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JetSignal AI - See Where You Really Stand</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-purple: #A78BFA; --brand-pink: #F472B6; --brand-blue: #60A5FA;
+            --bg-dark: #020617; --bg-card: rgba(15, 23, 42, 0.6);
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: #E2E8F0;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; overflow-x: hidden;
+        }
+        .aurora-bg {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;
+            background-image: 
+                radial-gradient(ellipse at 20% 20%, rgba(167, 139, 250, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 30%, rgba(244, 114, 182, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 60% 80%, rgba(96, 165, 250, 0.15) 0%, transparent 50%);
+            animation: aurora-flow 20s infinite alternate ease-in-out;
+        }
+        @keyframes aurora-flow { 0% { transform: rotate(0deg) scale(1.2); } 100% { transform: rotate(20deg) scale(1.5); } }
+        .gradient-text { background: linear-gradient(90deg, var(--brand-purple), var(--brand-pink), var(--brand-blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .card { background-color: var(--bg-card); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
+        @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 25px rgba(167, 139, 250, 0.4), 0 0 10px rgba(244, 114, 182, 0.2); } 50% { box-shadow: 0 0 50px rgba(167, 139, 250, 0.7), 0 0 15px rgba(244, 114, 182, 0.4); } }
+        .glowing-btn { animation: pulse-glow 3s infinite ease-in-out; }
+        .fade-in-up { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .fade-in-up.is-visible { opacity: 1; transform: translateY(0); }
+        .pyramid-draw path { stroke-dasharray: 1000; stroke-dashoffset: 1000; animation: draw 3s ease-in-out forwards; }
+        @keyframes draw { to { stroke-dashoffset: 0; } }
+        #gauge-circle-progress { transition: stroke-dashoffset 1.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .spinner { border: 3px solid rgba(255, 255, 255, 0.2); border-left-color: var(--brand-purple); border-radius: 50%; width: 32px; height: 32px; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="aurora-bg"></div>
+    <!-- Modal remains the same -->
+    <div id="waitlist-modal" class="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden transition-opacity duration-300" onclick="modalModule.close()"><div class="card rounded-2xl w-full max-w-md p-8 shadow-2xl relative" onclick="event.stopPropagation()"><button onclick="modalModule.close()" class="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button><div id="modal-content"><h2 class="text-2xl font-bold text-center mb-2 gradient-text">Join the JetSignal AI Beta</h2><p class="text-slate-400 text-center mb-6">Get early access and be the first to know when we launch.</p><form id="waitlist-form" onsubmit="modalModule.handleSubmit(event)"><input type="email" id="email" placeholder="Enter your email address" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300 mb-4"><button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 glowing-btn">Secure My Spot</button><p id="email-error" class="text-red-400 text-sm mt-2 text-center hidden">Please enter a valid email address.</p></form></div><div id="success-message" class="hidden text-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-green-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><h2 class="text-2xl font-bold text-center mt-4 text-green-400">You're On The List!</h2><p class="text-slate-400 text-center mt-2">Thanks! We'll let you know when it's ready.</p></div></div></div>
+
+    <div class="container mx-auto px-4 py-12 md:py-20">
+
+        <header class="text-center mb-24 md:mb-40">
+            <h1 class="text-5xl md:text-8xl font-black mb-6 tracking-tighter">Stop Guessing. <br/><span class="gradient-text">See The Signals.</span></h1>
+            <p class="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto">
+                **JetSignal AI** shows you where you really stand in any friendship or relationship. No more confusion, just clear answers.
+            </p>
+            <div class="mt-12 flex justify-center">
+                <a href="#analyzer" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-4 px-10 rounded-full transition-all duration-300 glowing-btn text-lg shadow-lg shadow-purple-500/30">
+                     Check Your Rank For Free
+                </a>
+            </div>
+        </header>
+
+        <!-- Analyzer Section -->
+        <section id="analyzer" class="text-center mb-24 md:mb-40 fade-in-up">
+            <h2 class="text-3xl md:text-5xl font-bold mb-4 gradient-text">The JetSignal™ Analyzer</h2>
+            <p class="text-slate-400 mb-12 max-w-2xl mx-auto">Answer these simple questions. Our free tool will give you a real-time Priority Score.</p>
+            <div class="card rounded-2xl p-6 md:p-10 max-w-2xl mx-auto text-left shadow-2xl">
+                <!-- The entire analyzer form, loader, and result logic from previous version goes here. It is self-contained and unchanged. -->
+                <div id="ranker-form"><div class="space-y-6"><div><label for="replyTime" class="block text-sm font-medium text-slate-300 mb-2">1. How fast are their replies?</label><select id="replyTime" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><option value="0">Very Fast (Minutes)</option><option value="1" selected>Okay (A few hours)</option><option value="2">Slow (Same day)</option><option value="3">Very Slow (1-3 days)</option><option value="4">Almost Never</option></select></div><div><label for="initiator" class="block text-sm font-medium text-slate-300 mb-2">2. Who starts the conversation?</label><select id="initiator" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><option value="0">Mostly Them</option><option value="1">Both equally</option><option value="2" selected>Mostly Me</option><option value="3">Always Me</option></select></div><div><label for="planFollowThrough" class="block text-sm font-medium text-slate-300 mb-2">3. Do they stick to plans?</label><select id="planFollowThrough" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><option value="0">Always</option><option value="1">Usually</option><option value="2">Sometimes they cancel</option><option value="3">Almost never</option></select></div><div><label for="conversationDepth" class="block text-sm font-medium text-slate-300 mb-2">4. How deep are the talks?</label><select id="conversationDepth" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"><option value="0">Very deep and real</option><option value="1">A good mix</option><option value="2" selected>Just small talk</option><option value="3">They only talk when they need something</option></select></div><button onclick="analyzerModule.calculateRank()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center text-lg">See My Score</button></div></div><div id="analyzing-state" class="hidden text-center py-10"><div class="spinner mx-auto"></div><p class="text-slate-400 mt-4 text-lg">AI is analyzing the signals...</p><p class="text-sm text-slate-500">Please wait.</p></div><div id="result" class="hidden"></div>
+            </div>
+        </section>
+
+        <!-- NEW "App Features" Section -->
+        <section class="mb-24 md:mb-40 fade-in-up">
+            <div class="text-center mb-16">
+                 <h2 class="text-3xl md:text-5xl font-bold mb-4">The Demo is Just the Beginning.</h2>
+                 <p class="text-slate-400 max-w-2xl mx-auto text-lg">The full <span class="gradient-text font-bold">JetSignal AI App</span> will give you the complete picture of your social life.</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="text-center lg:text-left">
+                    <img src="signal.png" alt="JetSignal AI App Mockup" class="rounded-2xl shadow-2xl mx-auto">
+                </div>
+                <div class="space-y-8">
+                    <div class="flex items-start"><div class="flex-shrink-0"><div class="p-3 bg-slate-800 rounded-lg"><svg class="w-6 h-6 gradient-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg></div></div><div class="ml-4"><h3 class="text-xl font-bold">Priority Dashboard</h3><p class="text-slate-400 mt-1">See all your connections ranked in one simple, clean dashboard. Know where to put your energy.</p></div></div>
+                    <div class="flex items-start"><div class="flex-shrink-0"><div class="p-3 bg-slate-800 rounded-lg"><svg class="w-6 h-6 gradient-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg></div></div><div class="ml-4"><h3 class="text-xl font-bold">Real-Time Signal Alerts</h3><p class="text-slate-400 mt-1">Get notifications when communication patterns change. "Signal from Golu has slowed by 30% this week."</p></div></div>
+                    <div class="flex items-start"><div class="flex-shrink-0"><div class="p-3 bg-slate-800 rounded-lg"><svg class="w-6 h-6 gradient-text" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div></div><div class="ml-4"><h3 class="text-xl font-bold">Relationship Health Score</h3><p class="text-slate-400 mt-1">Track the health of your connections over time with a single, evolving score. See trends before they become problems.</p></div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW "Join Waitlist" Section -->
+        <section class="card rounded-2xl py-16 md:py-20 text-center fade-in-up">
+             <h2 class="text-3xl md:text-5xl font-bold mb-4">The App is Coming Soon.</h2>
+             <p class="text-slate-400 mb-10 max-w-2xl mx-auto text-lg">Be the first to get access. Join the private beta waitlist and we'll email you when it's ready.</p>
+             <form class="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto px-4" onsubmit="modalModule.handleSubmit(event)">
+                <input type="email" id="waitlist-email-main" placeholder="Enter your email address" required class="w-full flex-grow bg-slate-800 border border-slate-700 rounded-lg px-4 py-3.5 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-300">
+                <button type="submit" class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold py-3.5 px-8 rounded-lg transition-all duration-300">
+                     Join Waitlist
+                 </button>
+             </form>
+             <div id="form-success-message" class="hidden mt-4 text-green-400">Thanks! You're on the list. We'll be in touch.</div>
+             <div id="form-error-message" class="hidden mt-4 text-red-400">Please enter a valid email.</div>
+        </section>
+
+    </div>
+
+    <footer class="text-center py-10 mt-12 border-t border-slate-800/50">
+        <p class="text-sm text-slate-500">&copy; 2025 Jetweb Labs. Built for clarity.</p>
+    </footer>
+
+    <script>
+        // --- Combined & Minified JS for Production ---
+        const modalModule=function(){const t=document.getElementById("waitlist-modal"),e=document.getElementById("modal-content"),n=document.getElementById("success-message"),o=document.getElementById("waitlist-form"),l=document.getElementById("email-error"),i=()=>{t.classList.remove("hidden")},s=()=>{t.classList.add("hidden"),setTimeout(()=>{e.classList.remove("hidden"),n.classList.add("hidden"),o.reset()},300)},a=t=>{t.preventDefault();const e=document.getElementById("email");/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.value)?(l.classList.add("hidden"),document.getElementById("modal-content").classList.add("hidden"),n.classList.remove("hidden"),console.log(`Email for waitlist: ${e.value}`)):l.classList.remove("hidden"); const mainFormSuccess=document.getElementById('form-success-message');if(mainFormSuccess)mainFormSuccess.classList.remove('hidden');};return{open:i,close:s,handleSubmit:a}}();
+        const analyzerModule=function(){const t=document.getElementById("ranker-form"),e=document.getElementById("analyzing-state"),n=document.getElementById("result"),o=()=>{t.classList.add("hidden"),e.classList.remove("hidden"),n.classList.add("hidden"),setTimeout(()=>{const t=[parseInt(document.getElementById("replyTime").value),parseInt(document.getElementById("initiator").value),parseInt(document.getElementById("planFollowThrough").value),parseInt(document.getElementById("conversationDepth").value)],o=13,i=t.reduce((t,e)=>t+e,0),s=Math.round(100-i/o*100),{rank:a,color:d,insights:r,recommendation:c}=l(s);n.innerHTML=u(s,a,d,r,c),e.classList.add("hidden"),n.classList.remove("hidden");const m=document.getElementById("gauge-circle-progress");if(m){const t=m.r.baseVal.value,e=2*t*Math.PI;m.style.strokeDashoffset=e-s/100*e}},2e3)},l=t=>t>=85?{rank:"High Priority",color:"#4ade80",insights:["Strong connection","Balanced effort","They value you a lot"],recommendation:"This is a great connection. Keep it strong!"}:t>=60?{rank:"Good Priority",color:"#facc15",insights:["They care, but are busy","You might put in more effort","Plans are mostly solid"],recommendation:"This is a decent connection. Just be aware of how much effort you're putting in."}:t>=30?{rank:"Low Priority",color:"#fb923c",insights:["Replies are very slow","You start most chats","Talk is often just for show"],recommendation:"Be careful here. You're giving more than you're getting. It might be time to pull back."}:{rank:"Not a Priority",color:"#f87171",insights:["They barely reply","You do all the work","They don't seem interested"],recommendation:"This connection is draining your energy. It's probably best to focus on people who value you."},u=(t,e,n,o,l)=>{const i=70,s=140*Math.PI;return`\n                    <div class="text-center border-t border-slate-700 pt-6">\n                        <h3 class="text-sm font-bold uppercase tracking-widest text-purple-400 mb-4">Your Priority Score</h3>\n                        <div class="relative w-48 h-48 mx-auto mb-4">\n                            <svg class="w-full h-full" viewBox="0 0 160 160">\n                                <circle cx="80" cy="80" r="${i}" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="15"></circle>\n                                <circle id="gauge-circle-progress" cx="80" cy="80" r="${i}" fill="none" stroke="${n}" stroke-width="15" stroke-linecap="round" stroke-dasharray="${s}" stroke-dashoffset="${s}" transform="rotate(-90 80 80)"></circle>\n                            </svg>\n                            <div class="absolute inset-0 flex items-center justify-center text-5xl font-black" style="color:${n};">${t}</div>\n                        </div>\n                        <p class="text-xl font-bold" style="color:${n};">${e}</p>\n                        <div class="text-left mt-8 p-4 bg-slate-900/50 rounded-lg">\n                            <h4 class="font-bold mb-3 text-slate-300">What This Score Means:</h4>\n                            <ul class="space-y-2 list-disc list-inside text-slate-400">${o.map(t=>`<li>${t}</li>`).join("")}</ul>\n                            <h4 class="font-bold mt-6 mb-3 text-slate-300">What You Should Do:</h4>\n                            <p class="text-slate-400">${l}</p>\n                        </div>\n                        <button onclick="analyzerModule.reset()" class="mt-8 w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300">Check Another Person</button>\n                    </div>\n                `},i=()=>{n.classList.add("hidden"),t.classList.remove("hidden")};return{calculateRank:o,reset:i}}();document.addEventListener("DOMContentLoaded",()=>{const t=document.querySelectorAll(".fade-in-up"),e=new IntersectionObserver(t=>{t.forEach(t=>{t.isIntersecting&&t.target.classList.add("is-visible")})},{threshold:.1});t.forEach(t=>e.observe(t))});
+    </script>
+</body>
+</html>
+
+
